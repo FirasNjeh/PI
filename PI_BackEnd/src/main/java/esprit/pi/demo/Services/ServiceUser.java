@@ -5,7 +5,11 @@ import esprit.pi.demo.entities.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @Service
 public class ServiceUser implements IServiceUser {
@@ -13,6 +17,7 @@ public class ServiceUser implements IServiceUser {
   private UserRepository userRepository;
     @Override
     public User creer(User user) {
+        user.setAge(calculateAge(user.getDateNaissance()));
         return userRepository.save(user);
     }
     @Override
@@ -51,6 +56,62 @@ public class ServiceUser implements IServiceUser {
         return "Utilisateur supprimer" ;
     }
 
+    @Override
+    public List<User> trierUtilisateurParNom() {
+        List<User> utilisateurs=userRepository.findAll();
+        return utilisateurs.stream().sorted(Comparator.comparing(User::getNom)).
+                collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> trierUtilisateurParPrenom() {
+        List<User> utilisateurs=userRepository.findAll();
+        return utilisateurs.stream().sorted(Comparator.comparing(User::getPrenom)).
+                collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> trierUtilisateurParSalaireCroissant() {
+        List<User> utilisateurs=userRepository.findAll();
+        return utilisateurs.stream().sorted(Comparator.comparingDouble(User::getSalaire)).
+                collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> trierUtilisateurParSalaireDecroissant() {
+        List<User> utilisateurs=userRepository.findAll();
+        return utilisateurs.stream().sorted(Comparator.comparingDouble(User::getSalaire).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> trierUtilisateurParAge() {
+        List<User> utilisateurs = userRepository.findAll();
+        return utilisateurs.stream()
+                .sorted(Comparator.comparingInt(user -> calculateAge(user.getDateNaissance())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> findByNom(String nom) {
+        return userRepository.findByNomLike(nom);
+    }
+
+    @Override
+    public List<User> findByPrenom(String prenom) {
+        return userRepository.findByPrenomLike(prenom);
+    }
+
+    private int calculateAge(LocalDate dateNaissance) {
+        LocalDate currentDate = LocalDate.now();
+        int age = currentDate.getYear() - dateNaissance.getYear();
+        if (dateNaissance.getMonthValue() > currentDate.getMonthValue() ||
+                (dateNaissance.getMonthValue() == currentDate.getMonthValue() &&
+                        dateNaissance.getDayOfMonth() > currentDate.getDayOfMonth())) {
+            age--;
+        }
+        return age;
+    }
 
 
 }

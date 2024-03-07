@@ -13,8 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Entity
-
-
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +21,7 @@ public class User implements Serializable {
     private String prenom;
     private int cin;
     private LocalDate dateNaissance;
+    private int age;
     private int numtel;
     private String email;
     private String adresse;
@@ -58,6 +57,9 @@ public class User implements Serializable {
     @ToString.Exclude
    @ManyToMany(mappedBy = "usersSalon")
     private List <Salon> salons;
+
+
+
 
 
 }
