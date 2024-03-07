@@ -31,4 +31,32 @@ public class UserController {
     public String delete(@PathVariable int id){
         return serviceUser.supprimer(id);
     }
+    @GetMapping("/sortbyname")
+    public List<User> trierUtilisateurParNom() {
+        return serviceUser.trierUtilisateurParNom();
+    }
+    @GetMapping("/sortbysurname")
+    public List<User> trierUtilisateurParPrenom() {
+        return serviceUser.trierUtilisateurParPrenom();
+    }
+    @GetMapping("/sortbysalairecroissant")
+    public List<User> trierUtilisateurParSalaireCroissant() {
+        return serviceUser.trierUtilisateurParSalaireCroissant();
+    }
+    @GetMapping("/sortbysalairedecroissant")
+    public List<User> trierUtilisateurParSalaireDecroissant() {
+        return serviceUser.trierUtilisateurParSalaireDecroissant();
+    }
+    @GetMapping("/sortbyage")
+    public List<User> trierUtilisateurParAge() {
+        return serviceUser.trierUtilisateurParAge();
+    }
+    @GetMapping("/{nom}")
+    public List<User> findByNom(@PathVariable String nom) {
+        return serviceUser.findByNom(nom);
+    }
+    @GetMapping("/{prenom}")
+    public List<User> findByPrenom(@PathVariable String prenom) {
+        return serviceUser.findByPrenom(prenom);
+    }
 }
