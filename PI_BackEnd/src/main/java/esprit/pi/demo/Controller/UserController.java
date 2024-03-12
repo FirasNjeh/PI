@@ -1,4 +1,6 @@
 package esprit.pi.demo.Controller;
+import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
+import esprit.pi.demo.DTO.GenderStatisticsDTO;
 import esprit.pi.demo.Services.IServiceUser;
 import esprit.pi.demo.entities.User;
 import lombok.AllArgsConstructor;
@@ -58,5 +60,34 @@ public class UserController {
     @GetMapping("/{prenom}")
     public List<User> findByPrenom(@PathVariable String prenom) {
         return serviceUser.findByPrenom(prenom);
+    }
+    @GetMapping("/sortbyrole")
+    public List<User> trierUtilisateurParRole() {
+        return serviceUser.trierUtilisateurParRole();
+    }
+    @GetMapping("/{nom}/{prenom}")
+    public List<User> findByPrenomAndNom(@PathVariable String prenom,@PathVariable String nom) {
+        return serviceUser.findByPrenomAndNom(prenom,nom);
+    }
+    @GetMapping("/{cin}")
+
+    public User findByCinLike(@PathVariable int cin) {
+        return serviceUser.findByCinLike(cin);
+    }
+    @GetMapping("/{matriculeFiscale}")
+    public User findByMatricule_fiscale(@PathVariable int matriculeFiscale) {
+        return serviceUser.findByMatricule_fiscale(matriculeFiscale);
+    }
+    @GetMapping("/agemoyen")
+    public double calculerAgeMoyenUsers() {
+        return serviceUser.calculerAgeMoyenUsers();
+    }
+    @GetMapping("/statgenre")
+    public GenderStatisticsDTO obtenirStatistiquesGenre() {
+        return serviceUser.obtenirStatistiquesGenre();
+    }
+    @GetMapping("/stattrancheage")
+    public AgeGroupStatisticsDTO obtenirStatistiquesTranchesAge() {
+        return serviceUser.obtenirStatistiquesTranchesAge();
     }
 }
