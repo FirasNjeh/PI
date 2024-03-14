@@ -16,7 +16,22 @@ import java.util.function.Function;
 
 @Service
 public class JwtServiceImp  implements JwtService{
-    private static final String SECRET_KEY="UwkjFm5DC0oCwlK3wjm37bpkKNOp0pHj";
+    private static final String SECRET_KEY="6F/OF1KTe44KQYmpcrX9uGcrk86BHc7DhguS9piN663r60c8CRn23DTwAwDNKp/dGO3e48PxS20p9HvyNZFEVUDn3LabwYbtqR8s/OVkSiqA2ImJyTN9ZxyITi6A6keJN56I+mzDpcXMQCrw6tCArLG+PMOjYIQbKpATjEVh4iiV91+xzh8z16S4prpJ8NJBN94Jx6rN59wQbl2mb0D8PW2xq7YSZ2p6h09SmJ3jF3j4CPiSBbRxF3AqpLcShrz/MWQ2r/Bpc26iv1cwlkcphn7WuYmM8eoGHni0QvCeO4BgjDZpaBZd+AkozoH8IvdLlj40X00IuczC6P56PoTQcmNcFVri97V01Jv3BBI6J4o=\n";
+
+    @Override
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username =extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    @Override
+    public boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
 
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
