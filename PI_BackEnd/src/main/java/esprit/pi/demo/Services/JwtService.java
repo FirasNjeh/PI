@@ -16,14 +16,14 @@ public interface JwtService {
 
     public String extractUsername(String token) ;
 
-//    public String generateRefreshToken(UserDetails userDetails) ;
+    public String generateRefreshToken(UserDetails userDetails) ;
 
     public String generateToken(UserDetails userDetails) ;
 
     public String generateToken(   Map<String, Object> extraClaims,
                                    UserDetails userDetails) ;
 
-//    public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration);
+    public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration);
 
     public Claims extractAllClaims(String token) ;
 
