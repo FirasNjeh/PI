@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +32,14 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .email(request.getEmail())
                 .mdp(passwordEncoder.encode(request.getMdp()))
                 .role(request.getRole())
+                .cin(request.getCin())
+                .dateNaissance(request.getDateNaissance())
+                .numtel(request.getNumtel())
+                .adresse(request.getAdresse())
+                .profession(request.getProfession())
+                .genre(request.getGenre())
+                .salaire(request.getSalaire())
+                .age(calculateAge(request.getDateNaissance()))
                 .build();
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
@@ -82,5 +91,15 @@ public class AuthenticationServiceImp implements AuthenticationService {
             }
         }
 
+    }
+    private int calculateAge(LocalDate dateNaissance) {
+        LocalDate currentDate = LocalDate.now();
+        int age = currentDate.getYear() - dateNaissance.getYear();
+        if (dateNaissance.getMonthValue() > currentDate.getMonthValue() ||
+                (dateNaissance.getMonthValue() == currentDate.getMonthValue() &&
+                        dateNaissance.getDayOfMonth() > currentDate.getDayOfMonth())) {
+            age--;
+        }
+        return age;
     }
 }

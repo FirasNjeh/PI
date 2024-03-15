@@ -172,7 +172,7 @@ public class ServiceUser implements IServiceUser {
     }
 
 
-    private int calculateAge(LocalDate dateNaissance) {
+    public int calculateAge(LocalDate dateNaissance) {
         LocalDate currentDate = LocalDate.now();
         int age = currentDate.getYear() - dateNaissance.getYear();
         if (dateNaissance.getMonthValue() > currentDate.getMonthValue() ||
