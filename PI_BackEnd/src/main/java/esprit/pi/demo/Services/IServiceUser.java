@@ -1,8 +1,11 @@
 package esprit.pi.demo.Services;
 
 import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
+import esprit.pi.demo.DTO.ChangePasswordRequest;
 import esprit.pi.demo.entities.User;
 import esprit.pi.demo.DTO.GenderStatisticsDTO;
+
+import java.security.Principal;
 import java.util.List;
 
 public interface IServiceUser {
@@ -26,6 +29,7 @@ public interface IServiceUser {
     double calculerAgeMoyenUsers();
      GenderStatisticsDTO obtenirStatistiquesGenre();
     AgeGroupStatisticsDTO obtenirStatistiquesTranchesAge();
+    void changePassword(ChangePasswordRequest request, Principal connectedUser);
 
 
 

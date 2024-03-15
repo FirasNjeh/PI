@@ -1,13 +1,17 @@
 package esprit.pi.demo.Services;
 
 import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
+import esprit.pi.demo.DTO.ChangePasswordRequest;
 import esprit.pi.demo.DTO.GenderStatisticsDTO;
 import esprit.pi.demo.Repository.UserRepository;
 import esprit.pi.demo.entities.Genre;
 import esprit.pi.demo.entities.User;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class ServiceUser implements IServiceUser {
 
   private UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
     @Override
     public User creer(User user) {
         user.setAge(calculateAge(user.getDateNaissance()));
@@ -169,6 +174,19 @@ public class ServiceUser implements IServiceUser {
         double pourcentageAinesQuatriemeAge = (ainesQuatriemeAge * 100.0) / totalUsers;
 
         return new AgeGroupStatisticsDTO(pourcentageJeunesAdultes, pourcentageAdultes, pourcentageAinesTroisiemeAge, pourcentageAinesQuatriemeAge);
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
+        var user= (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
+            throw new IllegalStateException("Wrong Password");
+        }
+        if(!request.getNewPassword().equals(request.getConfirmationPassword())){
+            throw new IllegalStateException("Password are not the same");
+        }
+        user.setMdp(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
 
