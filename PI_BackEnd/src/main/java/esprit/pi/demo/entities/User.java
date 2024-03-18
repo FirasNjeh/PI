@@ -63,6 +63,8 @@ public class User implements UserDetails {
     @ToString.Exclude
    @ManyToMany(mappedBy = "usersSalon")
     private List <Salon> salons;
+    @OneToMany(mappedBy = "userToken")
+    private List<Token> tokens;
 
 
     @Override

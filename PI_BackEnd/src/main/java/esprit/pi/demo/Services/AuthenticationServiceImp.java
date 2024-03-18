@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import esprit.pi.demo.DTO.AuthenticationRequest;
 import esprit.pi.demo.DTO.AuthenticationResponse;
 import esprit.pi.demo.DTO.RegisterRequest;
+import esprit.pi.demo.Repository.TokenRepository;
 import esprit.pi.demo.Repository.UserRepository;
+import esprit.pi.demo.entities.Token;
+import esprit.pi.demo.entities.TokenType;
 import esprit.pi.demo.entities.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +24,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AuthenticationServiceImp implements AuthenticationService {
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -41,13 +45,35 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .salaire(request.getSalaire())
                 .age(calculateAge(request.getDateNaissance()))
                 .build();
-        userRepository.save(user);
+        var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
+        saveUserToken(savedUser, jwtToken);
         var refreshToken =jwtService.generateRefreshToken(user) ;
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+    private void revokeAllUserTokens(User user){
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        if(validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(t -> {
+          t.setExpired(true);
+          t.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .userToken(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
     }
 
     @Override
@@ -59,6 +85,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user,jwtToken);
         var refreshToken =jwtService.generateRefreshToken(user) ;
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -83,6 +111,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
                      .orElseThrow();
             if (jwtService.isTokenValid(refreshToken,userDetails)){
                 var accessToken = jwtService.generateToken(userDetails);
+                revokeAllUserTokens(userDetails);
+                saveUserToken(userDetails,accessToken);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
