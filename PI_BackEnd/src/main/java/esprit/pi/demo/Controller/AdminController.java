@@ -19,8 +19,12 @@ public class AdminController {
         return serviceUser.lire();
     }
     @PostMapping("/ban/{userId}")
-    public void bannirUtilisateur(@PathVariable int userId) {
+    public void banUser(@PathVariable int userId) {
         serviceUser.banUser(userId);
+    }
+    @PostMapping("/deban/{userId}")
+    public void debanUser(@PathVariable int userId) {
+        serviceUser.debanUser(userId);
     }
 
 }

@@ -31,6 +31,10 @@ public interface IServiceUser {
     AgeGroupStatisticsDTO obtenirStatistiquesTranchesAge();
     void changePassword(ChangePasswordRequest request, Principal connectedUser);
     void banUser(int userId);
+    void debanUser(int userId);
+
+    User getCurrentUser(Principal connectedUser) ;
+
 
 
 

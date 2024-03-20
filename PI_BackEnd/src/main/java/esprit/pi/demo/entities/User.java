@@ -40,6 +40,7 @@ public class User implements UserDetails {
     private String image;
     private float salaire;
     private int matriculeFiscale;
+    @Getter
     private boolean banni;
     @ToString.Exclude
     @OneToMany(mappedBy = "user")

@@ -9,6 +9,7 @@ import esprit.pi.demo.entities.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -202,6 +203,32 @@ public class ServiceUser implements IServiceUser {
         else {
             throw new EntityNotFoundException("Utilisateur non trouvé avec l'ID : " + userId);
         }
+    }
+
+    @Override
+    public void debanUser(int userId) {
+
+        Optional<User> optionaluser =userRepository.findById(userId);
+        if(optionaluser.isPresent()){
+            User user = optionaluser.get();
+            user.setBanni(false);
+            userRepository.save(user);
+        }
+        else {
+            throw new EntityNotFoundException("Utilisateur non trouvé avec l'ID : " + userId);
+        }
+
+    }
+
+    @Override
+    public User getCurrentUser(Principal connectedUser) {
+        if (connectedUser instanceof UsernamePasswordAuthenticationToken) {
+            Object principal = ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+            if (principal instanceof UserDetails) {
+                return (User) principal;
+            }
+        }
+        return null; // ou lancez une exception appropriée si nécessaire
     }
 
 
