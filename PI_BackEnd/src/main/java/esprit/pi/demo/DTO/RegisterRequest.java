@@ -1,7 +1,7 @@
 package esprit.pi.demo.DTO;
 
-import esprit.pi.demo.entities.Genre;
-import esprit.pi.demo.entities.Role;
+import esprit.pi.demo.entities.Enumeration.Genre;
+import esprit.pi.demo.entities.Enumeration.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +27,6 @@ public class RegisterRequest {
     private Genre genre;
     private float salaire;
     private int age;
+    private boolean banni;
 
 }

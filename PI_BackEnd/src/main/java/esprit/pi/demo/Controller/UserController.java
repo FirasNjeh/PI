@@ -23,7 +23,7 @@ public class UserController {
     }
     @GetMapping("/all")
     public List<User> read(){return serviceUser.lire();}
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public User findUserById (@PathVariable int id){
         return serviceUser.getUserById(id);
     }

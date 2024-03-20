@@ -4,8 +4,9 @@ import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
 import esprit.pi.demo.DTO.ChangePasswordRequest;
 import esprit.pi.demo.DTO.GenderStatisticsDTO;
 import esprit.pi.demo.Repository.UserRepository;
-import esprit.pi.demo.entities.Genre;
+import esprit.pi.demo.entities.Enumeration.Genre;
 import esprit.pi.demo.entities.User;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -187,6 +189,19 @@ public class ServiceUser implements IServiceUser {
         }
         user.setMdp(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    @Override
+    public void banUser(int userId) {
+        Optional<User> optionaluser =userRepository.findById(userId);
+        if(optionaluser.isPresent()){
+            User user = optionaluser.get();
+            user.setBanni(true);
+            userRepository.save(user);
+        }
+        else {
+            throw new EntityNotFoundException("Utilisateur non trouvé avec l'ID : " + userId);
+        }
     }
 
 

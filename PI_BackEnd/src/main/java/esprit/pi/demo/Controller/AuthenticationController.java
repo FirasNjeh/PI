@@ -3,7 +3,7 @@ package esprit.pi.demo.Controller;
 import esprit.pi.demo.DTO.AuthenticationRequest;
 import esprit.pi.demo.DTO.AuthenticationResponse;
 import esprit.pi.demo.DTO.RegisterRequest;
-import esprit.pi.demo.Services.AuthenticationService;
+import esprit.pi.demo.Security.Services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

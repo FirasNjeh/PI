@@ -1,9 +1,10 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.Genre;
+import esprit.pi.demo.entities.Enumeration.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
@@ -39,6 +40,7 @@ public class User implements UserDetails {
     private String image;
     private float salaire;
     private int matriculeFiscale;
+    private boolean banni;
     @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<Contrat_Factoring> contratFactorings;
@@ -69,7 +71,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return role.getAuthorities();
     }
 
 
