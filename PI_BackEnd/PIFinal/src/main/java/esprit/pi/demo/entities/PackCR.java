@@ -22,6 +22,7 @@ public class PackCR implements Serializable {
     private float montantMin;
     private float montantMax;
     private String image;
+    private String nomImage;
     @Enumerated(EnumType.STRING)
     private PackCredit packCredit;
     @ToString.Exclude

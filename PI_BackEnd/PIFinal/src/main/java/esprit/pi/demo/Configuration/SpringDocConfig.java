@@ -86,14 +86,6 @@ public class SpringDocConfig {
                 .build();
     }
 
-    @Bean
-    public GroupedOpenApi pdfApi() {
-        return GroupedOpenApi.builder()
-                .group("Only pdf Management API")
-                .pathsToMatch("/pdf/**")
-                .pathsToExclude("**")
-                .build();
-    }
 
 
 }

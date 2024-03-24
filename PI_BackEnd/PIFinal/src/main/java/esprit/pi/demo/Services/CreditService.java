@@ -1,22 +1,31 @@
 package esprit.pi.demo.Services;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import esprit.pi.demo.Repository.CreditRepository;
 import esprit.pi.demo.Repository.TransactionCRepository;
 import esprit.pi.demo.Repository.UserRepository;
 import esprit.pi.demo.entities.*;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.json.JSONObject;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Period;
@@ -396,6 +405,26 @@ return credit;
         return interestRate;
 
     }
+
+    @Override
+    public double[] SimulateurCredit(float MontantCredit , int nbmois){
+        double taux = 0.23  ;
+        double[] matrice = new double[4];
+//            float salaire=iUser.getUserByEmail(iMicroGrowth.getCurrentUserName()).getSalaire();
+
+        double tauxMensuel = taux / 12;
+        double mensualite = (MontantCredit * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -nbmois));
+        System.out.println("Le Montant est :"+ MontantCredit);
+        matrice[0]=MontantCredit;
+        System.out.println("Taux d'intérêt annuel : " + taux);
+        matrice[1]=taux;
+        System.out.println("Mensualité : " + mensualite);
+        matrice[2]=mensualite;;
+        System.out.println("Duree :"+ nbmois/12 + " années");
+        matrice[3]=(nbmois/12);
+        return matrice;
+    }
+
     public void sendEmail(String tomail, String Subject, String body) throws MessagingException {
 
         String from ="techwork414@gmail.com";
@@ -413,7 +442,6 @@ return credit;
             }
         });
 
-
         Message message=new MimeMessage(session);
         message.setFrom(new InternetAddress(from));
         message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(tomail));
@@ -423,99 +451,90 @@ return credit;
         Transport.send(message);
     }
 
-//    @Override
-//    public File genererCreditPDF(int nbmois) throws IOException, DocumentException {
-//        //User user = iUser.getUserByEmail(iMicroGrowth.getCurrentUserName());
-//        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
-//        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("credit.pdf"));
-//
-//        // Ajouter le header
-//        HeaderFooter header = new HeaderFooter(new Phrase("MicroGrowth"), false);
-//        header.setAlignment(Element.ALIGN_CENTER);
-//        document.setHeader(header);
-//
-//        // Ajouter le footer
-//        Font FooterFont = new Font(Font.HELVETICA, 7, Font.NORMAL);
-//
-//        Paragraph footerText = new Paragraph("Le résultat de cette simulation est non contractuel et revêt un caractère strictement informatif.\n" ,FooterFont);
-//
-//        footerText.setSpacingBefore(10f); // ajoute un espace de 10 points avant le texte du footer
-//
-//        HeaderFooter footer = new HeaderFooter(footerText, new Phrase(" - Page ",FooterFont));
-//        footer.setAlignment(Element.ALIGN_LEFT);
-//        document.setFooter(footer);
-//
-//
-//        // Ouvrir le document
-//        document.open();
-//
-//        // Ajouter le logo
-//        Image logo = Image.getInstance("logo.png");
-//        logo.scaleAbsolute(100f, 100f);
-//        logo.setAlignment(Element.ALIGN_CENTER);
-//        document.add(logo);
-//
-//        // Ajouter les informations du contrat
-//        double max = MaxCredit(37);
-//        Font boldFont = new Font(Font.HELVETICA, 16, Font.BOLD);
-//        Font normalFont = new Font(Font.HELVETICA, 12, Font.NORMAL);
-//        Paragraph montantMax = new Paragraph("Montant maximum : " + max + " dinars", boldFont);
-//        montantMax.setSpacingAfter(20f);
-//        document.add(montantMax);
-//
-////        Paragraph mensualite = new Paragraph("Mensualité : " + user.getSalaire()*0.43 + " dinars", normalFont);
-////        mensualite.setSpacingAfter(20f);
-////        document.add(mensualite);
-//
-//        Paragraph duree = new Paragraph("Durée : " + nbmois + " mois", normalFont);
-//        duree.setSpacingAfter(20f);
-//        document.add(duree);
-//
-//        Paragraph taux = new Paragraph("Taux d'intérêt : 0.23%", normalFont);
-//        taux.setSpacingAfter(20f);
-//        document.add(taux);
-//
-//
-//        // Fermer le document
-//        document.close();
-//        return null;
-//    }
 
     @Override
-    public void export(HttpServletResponse response, int id) throws IOException, DocumentException {
-        Credit credit= repository.findById(id).orElse(null);
-         Document document = new Document(PageSize.A4);
-        PdfWriter.getInstance(document, response.getOutputStream());
+    public float[][] calcul_tableau_credit(int id) {
+        Credit c=getCreditById(id);
+        float amt, interest, monthly_payment;
+        float[][] matrice = new float[c.getDuree() * 12][4];
 
-        document.open();
-        Font fontTitle= FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-        fontTitle.setSize(18);
+        matrice[0][0] = c.getMontant(); // montant
+        matrice[0][1] = (matrice[0][0] * c.getTauxInteret())/ 12; //montant d'interet mensuel
+        matrice[0][2] = matrice[0][0] / (c.getDuree() * 12); // montant a payer mensuellement
+        amt = matrice[0][2];
 
-        Paragraph paragraph= new Paragraph("Tableau d''Amortissement "+String.valueOf(id),fontTitle);
-        paragraph.setAlignment(Paragraph.ALIGN_CENTER);
-        document.add(paragraph);
+        matrice[0][3] = amt + matrice[0][1]; // paiement mensuel total
 
-        PdfPTable table = new PdfPTable(3);
-        PdfPCell cell= new PdfPCell();
-        cell.setPhrase(new Phrase("Montant restant",fontTitle));
+        for (int j = 1; j < c.getDuree() * 12; j++) //boucle sur tous les mois
+        {
+            matrice[j][0] = matrice[j - 1][0] - amt;//montant
+            matrice[j][1] = (matrice[j][0] * c.getTauxInteret()) / 12;//interet
+            matrice[j][2] = matrice[0][0] / (c.getDuree() * 12);//amt
+            matrice[j][3] = amt + matrice[j][1];//mensualite
 
-//        table.addCell(cell);
-//        cell.setPhrase(new Phrase("Amortissement",fontTitle));
+            if (j == c.getDuree() * 12 - 1) {
+                // Dernier paiement
+                if (matrice[j][0] != 0) {
+                    matrice[j][3] += matrice[j][0];
+                    amt += matrice[j][0];
+                    matrice[j][0] = 0;
+                    matrice[j][2] = 0;
+                }
+            } else {
+                amt = matrice[0][2];
+            }
+        }
 
-        table.addCell(cell);
-        cell.setPhrase(new Phrase("Interet",fontTitle));
+        return matrice;
+    }
 
-        table.addCell(cell);
-        cell.setPhrase(new Phrase("Annuité",fontTitle));
+    @Override
+    public BigDecimal Currency(String convertTo, BigDecimal quantity) throws IOException {
 
 
-            table.addCell(String.valueOf(credit.getMontant()));
-            table.addCell(String.valueOf(credit.getTauxInteret()));
-            table.addCell(String.valueOf(credit.getMonthlyPayment()));
+        String urlString = "https://api.fxratesapi.com/latest?base=TND&api_key=fxr_live_afa4bfa16fe5a0285657bd81c9d3d406c8ca";
+        //"https://api.fxratesapi.com/convert?from=" +convertFrom +"&to=" +convertTo+" &amount="+quantity+"api_key=fxr_live_afa4bfa16fe5a0285657bd81c9d3d406c8ca";
 
-document.add(table);
 
-document.close();
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(urlString)
+                .get()
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String stringResponse = response.body().string();
+        JSONObject jsonObject = new JSONObject(stringResponse);
+        JSONObject ratesObject = jsonObject.getJSONObject("rates");
+        BigDecimal rate = ratesObject.getBigDecimal(convertTo.toUpperCase());
+
+        BigDecimal result = rate.multiply(quantity);
+        System.out.println(result);
+        return(result);
+
+    }
+    @Override
+    public void generateQRCodeImage(String text, int width, int height, String filePath)
+            throws WriterException, IOException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
+
+        Path path = FileSystems.getDefault().getPath(filePath);
+        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+
+    }
+
+    @Override
+    public byte[] getQRCodeImage(String text, int width, int height) throws WriterException, IOException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
+
+        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+        MatrixToImageConfig con = new MatrixToImageConfig( 0xFF000002 , 0xFFFFC041 ) ;
+
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream,con);
+        byte[] pngData = pngOutputStream.toByteArray();
+        return pngData;
     }
 
 
@@ -594,127 +613,5 @@ document.close();
 //
 
 
-//
-//    @Override
-//    public String SimulateurCredit(Credit credit,String S){
-//        repository.save(credit);
-//
-//        float MontantCredit=credit.getMontant();
-//        double taux =credit.getTauxInteret()   ;
-//        //int nbmois=c.getDuree()*12;
-//        double[] matrice = new double[4];
-//        //double tauxMensuel = taux / 12;
-//        double Annuite=calculRemboursementAnnuite(credit.getId());
-//        //double mensualite = (MontantCredit * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -nbmois));
-//
-//        S="Le Montant est :"+ MontantCredit+"Taux d'intérêt annuel : " + taux+ "Coût total  : " + (Annuite - MontantCredit);
-////       // matrice[0]=MontantCredit;
-//        //System.out.println("Taux d'intérêt annuel : " + taux);
-////       // matrice[1]=taux;
-////        System.out.println("Annuité : " + Annuite);
-//       // matrice[2]=Annuite;
-//   //     System.out.println("Coût total  : " + (Annuite - MontantCredit));
-////       // matrice[3]=(Annuite - MontantCredit);
-//        return S;
-//    }
-//
 
-//
-//    @Override
-//    public File genererCreditPDF(int id) throws IOException, DocumentException {
-//        Credit c=getCreditById(id);
-//        User user=c.getUserCR();
-//        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
-//        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("credit.pdf"));
-//
-//        // Ajouter le header
-//        HeaderFooter header = new HeaderFooter(new Phrase("FundHub"), false);
-//        header.setAlignment(Element.ALIGN_CENTER);
-//        document.setHeader(header);
-//
-//        // Ajouter le footer
-//        Font FooterFont = new Font(Font.HELVETICA, 7, Font.NORMAL);
-//
-//        Paragraph footerText = new Paragraph("Le résultat de cette simulation revêt un caractère strictement informatif.\n"
-//                ,FooterFont);
-//
-//        footerText.setSpacingBefore(10f); // ajoute un espace de 10 points avant le texte du footer
-//
-//        HeaderFooter footer = new HeaderFooter(footerText, new Phrase(" - Page ",FooterFont));
-//        footer.setAlignment(Element.ALIGN_LEFT);
-//        document.setFooter(footer);
-//
-//
-//        // Ouvrir le document
-//        document.open();
-//
-//        // Ajouter le logo
-//        Image logo = Image.getInstance("logo_MicroGrowth.png");
-//        logo.scaleAbsolute(100f, 100f);
-//        logo.setAlignment(Element.ALIGN_CENTER);
-//        document.add(logo);
-//
-//         //Ajouter les informations du contrat
-//        double max = MaxCredit(id);
-//        Font boldFont = new Font(Font.HELVETICA, 16, Font.BOLD);
-//        Font normalFont = new Font(Font.HELVETICA, 12, Font.NORMAL);
-//        Paragraph montantMax = new Paragraph("Montant maximum : " + max + " dinars", boldFont);
-//        montantMax.setSpacingAfter(20f);
-//        document.add(montantMax);
-//
-//        Paragraph mensualite = new Paragraph("Mensualité : " + user.getSalaire()*0.43 + " dinars");
-//        mensualite.setSpacingAfter(20f);
-//        document.add(mensualite);
-//
-//        Paragraph duree = new Paragraph("Durée : " + c.getDuree()*12 + " mois");
-//        duree.setSpacingAfter(20f);
-//        document.add(duree);
-//
-//        Paragraph taux = new Paragraph("Taux d'intérêt : 0.23%");
-//        taux.setSpacingAfter(20f);
-//        document.add(taux);
-//
-//
-//        // Fermer le document
-//        document.close();
-//        return null;
-//    }
-//
-//    @Override
-//    public float[][] calcul_tableau_credit(int id) {
-//        Credit c=getCreditById(id);
-//        float amt, interest, monthly_payment;
-//        float[][] matrice = new float[c.getDuree() * 12][4];
-//
-//        matrice[0][0] = c.getMontant();
-//        matrice[0][1] = (matrice[0][0] * c.getTauxInteret())/ 12;
-//        matrice[0][2] = matrice[0][0] / (c.getDuree() * 12);
-//        amt = matrice[0][2];
-//
-//        matrice[0][3] = amt + matrice[0][1];
-//
-//        for (int j = 1; j < c.getDuree() * 12; j++) {
-//            matrice[j][0] = matrice[j - 1][0] - amt;//montant
-//            matrice[j][1] = (matrice[j][0] * c.getTauxInteret()) / 12;//interet
-//            matrice[j][2] = matrice[0][0] / (c.getDuree() * 12);//amt
-//            matrice[j][3] = amt + matrice[j][1];//mensualite
-//
-//            if (j == c.getDuree() * 12 - 1) {
-//                // Dernier paiement
-//                if (matrice[j][0] != 0) {
-//                    matrice[j][3] += matrice[j][0];
-//                    amt += matrice[j][0];
-//                    matrice[j][0] = 0;
-//                    matrice[j][2] = 0;
-//                }
-//            } else {
-//                amt = matrice[0][2];
-//            }
-//        }
-//
-//        return matrice;
-//    }
-//
-//
-//
 }

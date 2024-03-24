@@ -1,17 +1,16 @@
 package esprit.pi.demo.Controller;
 
-import esprit.pi.demo.Repository.CreditRepository;
+import ch.qos.logback.core.model.Model;
+import com.google.zxing.WriterException;
 import esprit.pi.demo.Services.ICreditService;
 import esprit.pi.demo.entities.Credit;
 import esprit.pi.demo.entities.StatusCredit;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -74,10 +73,6 @@ public class CreditController {
         return service.calculRemboursementAnnuite(id);
     }
 
-//    @GetMapping("/pdf/{id}")
-//    public void export(HttpServletResponse response,@PathVariable int id) throws IOException, DocumentException {
-//    }
-
     @GetMapping("filtrage/{field}/{value}")
     public List<Credit> getCreditsFiltrage(@PathVariable String field,@PathVariable String value) {
         return service.getCreditsFiltrage(field, value);
@@ -86,11 +81,11 @@ public class CreditController {
     public List<Credit> getCreditsTrie(@PathVariable String field,@PathVariable String value) {
         return service.getCreditsTrie(field, value);
     }
-//    @PostMapping("/simulateur")
-//    public String SimulateurCredit( Credit credit,@RequestBody String S){
-//        return service.SimulateurCredit(credit,S);
-//    }
 
+    @GetMapping("/currency/{convertTo}/{quantity}")
+    public BigDecimal Convert(@PathVariable String convertTo, @PathVariable BigDecimal quantity) throws IOException {
+        return service.Currency(convertTo,quantity);
+    }
 
     @GetMapping("/MaxCredit/{id}")
     public double MaxCredit(@PathVariable int id) {
@@ -106,33 +101,40 @@ public class CreditController {
         return service.calculateInterestRate(id);
     }
 
-    @GetMapping("/pdf/generateAmortissement/{id}")
-    public void generatePdf(HttpServletResponse response, @PathVariable int id) throws IOException {
-        response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-
-        String headerKey ="Content-Disposition";
-        String headerValue ="attachment; filename=Tableau_Credit_N_"+id+".pdf";
-        response.setHeader(headerKey, headerValue);
-        ICreditService.export(response,id);
+    @GetMapping("simulateur/{MontantCredit}/{nbmois}")
+    public double[] SimulateurCredit(@PathVariable float MontantCredit, @PathVariable int nbmois) {
+        return service.SimulateurCredit(MontantCredit, nbmois);
     }
-        CreditRepository repo;
-    
-//    @GetMapping("/admin/export-to-pdf-credits")
-//    public void generatePdfFile(HttpServletResponse response) throws DocumentException, IOException
-//    {
-//        response.setContentType("application/pdf");
-//        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
-//        String currentDateTime = dateFormat.format(new Date());
-//        String headerkey = "Content-Disposition";
-//        String headervalue = "attachment; filename=credit" + currentDateTime + ".pdf";
-//        response.setHeader(headerkey, headervalue);
-//        List < Credit > listofCredits = repo.findAll();
-//        PdfGeneratorCredit generator = new PdfGeneratorCredit();
-//
-//        generator.generate(listofCredits, (javax.servlet.http.HttpServletResponse) response);
-//    }
+
+    @GetMapping("/tableau_credit/{id}")
+    public float[][] calcul_tableau_credit(@PathVariable int id) {
+        return service.calcul_tableau_credit(id);
+    }
+
+
+    @GetMapping("/QRCode/{id}")
+    public String getQRCode(Model model,int id){
+        String credit="http://localhost:8081/MonthlyPayment/MonthlyPayment/creditNum/"+id;
+        String QR_CODE_IMAGE_PATH = "./Assets/images/Credit_"+id+".png";
+
+
+        byte[] image = new byte[0];
+        try {
+            // Generate and Return Qr Code in Byte Array
+            image = service.getQRCodeImage(credit,250,250);
+
+            // Generate and Save Qr Code Image in static/image folder
+            service.generateQRCodeImage(credit,250,250,QR_CODE_IMAGE_PATH);
+
+        } catch (WriterException | IOException e) {
+            e.printStackTrace();
+        }
+        // Convert Byte Array into Base64 Encode String
+        String qrcode = Base64.getEncoder().encodeToString(image);
+
+        return "qrcode généré avec succès";
+    }
+
 
 
 }
