@@ -8,7 +8,7 @@ public interface IGarantService {
     Garant saveGarant(Garant garant);
     List<Garant> getGarants();
     Garant getById(int id);
-    Garant getGarantByLastName(String Nom);
+    List<Garant> getGarantByLastName(String Nom);
     String deleteGarant (int id);
     Garant updateGarant(int id,Garant garant);
 }

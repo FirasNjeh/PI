@@ -29,7 +29,7 @@ public class GarantController  {
     }
 
     @GetMapping("/name/{name}")
-    public Garant findGarantByLastName(@PathVariable String name){
+    public List<Garant> findGarantByLastName(@PathVariable String name){
         return service.getGarantByLastName(name);
     }
 

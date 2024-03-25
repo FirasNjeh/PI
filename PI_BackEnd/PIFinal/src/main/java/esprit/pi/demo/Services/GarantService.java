@@ -27,7 +27,7 @@ public class GarantService implements IGarantService{
     }
 
     @Override
-    public Garant getGarantByLastName(String name) {
+    public List<Garant> getGarantByLastName(String name) {
         return repository.findByName(name);
     }
 
