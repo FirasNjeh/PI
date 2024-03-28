@@ -2,6 +2,7 @@ package esprit.pi.demo.Services;
 
 import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
 import esprit.pi.demo.DTO.ChangePasswordRequest;
+import esprit.pi.demo.DTO.UpdateUserRequest;
 import esprit.pi.demo.entities.User;
 import esprit.pi.demo.DTO.GenderStatisticsDTO;
 
@@ -12,7 +13,6 @@ public interface IServiceUser {
     User creer(User user);
     List<User> lire();
     User getUserById (int id);
-    User modifier(int id, User user);
     String supprimer(int id);
     List <User> trierUtilisateurParNom();
     List <User> trierUtilisateurParPrenom();
@@ -34,6 +34,7 @@ public interface IServiceUser {
     void debanUser(int userId);
 
     User getCurrentUser(Principal connectedUser) ;
+    void updateCurrentUser(Principal connectedUser, UpdateUserRequest updatedUser);
 
 
 

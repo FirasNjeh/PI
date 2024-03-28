@@ -36,7 +36,6 @@ public class User implements UserDetails {
     private Genre genre;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private int nbr_credit;
     private String image;
     private float salaire;
     private int matriculeFiscale;

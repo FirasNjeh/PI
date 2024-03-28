@@ -3,6 +3,7 @@ package esprit.pi.demo.Services;
 import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
 import esprit.pi.demo.DTO.ChangePasswordRequest;
 import esprit.pi.demo.DTO.GenderStatisticsDTO;
+import esprit.pi.demo.DTO.UpdateUserRequest;
 import esprit.pi.demo.Repository.UserRepository;
 import esprit.pi.demo.entities.Enumeration.Genre;
 import esprit.pi.demo.entities.User;
@@ -39,28 +40,7 @@ public class ServiceUser implements IServiceUser {
     public User getUserById (int id){
         return userRepository.findById(id).orElse(null);
     }
-    @Override
-    public User modifier(int id, User user) {
-        return userRepository.findById(id).map(user1 -> {
-            user1.setNom(user.getNom());
-            user1.setPrenom(user.getPrenom());
-//            user1.setUsername(user.getUsername());
-            user1.setCin(user.getCin());
-            user1.setAdresse(user.getAdresse());
-            user1.setDateNaissance(user.getDateNaissance());
-            user1.setNumtel(user.getNumtel());
-            user1.setEmail(user.getEmail());
-            user1.setMdp(user.getMdp());
-            user1.setProfession(user.getProfession());
-            user1.setRole(user.getRole());
-            user1.setNbr_credit(user.getNbr_credit());
-            user1.setImage(user.getImage());
-            user1.setSalaire(user.getSalaire());
-            user.setMatriculeFiscale(user.getMatriculeFiscale());
-            return userRepository.save(user1);
 
-        }).orElse(null);
-    }
 
     @Override
     public String supprimer(int id) {
@@ -215,7 +195,7 @@ public class ServiceUser implements IServiceUser {
             userRepository.save(user);
         }
         else {
-            throw new EntityNotFoundException("Utilisateur non trouvé avec l'ID : " + userId);
+            throw new EntityNotFoundException("Utilisateur inexistant " );
         }
 
     }
@@ -228,7 +208,25 @@ public class ServiceUser implements IServiceUser {
                 return (User) principal;
             }
         }
-        return null; // ou lancez une exception appropriée si nécessaire
+        return null;
+    }
+
+    @Override
+    public void updateCurrentUser(Principal connectedUser, UpdateUserRequest updatedUser) {
+        User currentUser=getCurrentUser(connectedUser);
+        if(updatedUser.getNom() != null) currentUser.setNom(updatedUser.getNom());
+        if(updatedUser.getPrenom() != null) currentUser.setPrenom(updatedUser.getPrenom());
+        if(updatedUser.getEmail() != null) currentUser.setEmail(updatedUser.getEmail());
+        if(updatedUser.getCin() != -1) currentUser.setCin(updatedUser.getCin());
+        if(updatedUser.getDateNaissance() != null) currentUser.setDateNaissance(updatedUser.getDateNaissance());
+        if(updatedUser.getNumtel() != -1) currentUser.setNumtel(updatedUser.getNumtel());
+        if(updatedUser.getProfession() != null) currentUser.setProfession(updatedUser.getProfession());
+        if(updatedUser.getSalaire() != -1) currentUser.setSalaire(updatedUser.getSalaire());
+        if(updatedUser.getAge() != -1)
+            if (updatedUser.getDateNaissance() != null) {
+            currentUser.setAge(calculateAge(updatedUser.getDateNaissance()));
+        }
+        userRepository.save(currentUser) ;
     }
 
 

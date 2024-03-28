@@ -1,8 +1,6 @@
 package esprit.pi.demo.Controller;
 
-import esprit.pi.demo.DTO.AuthenticationRequest;
-import esprit.pi.demo.DTO.AuthenticationResponse;
-import esprit.pi.demo.DTO.RegisterRequest;
+import esprit.pi.demo.DTO.*;
 import esprit.pi.demo.Security.Services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +30,8 @@ public class AuthenticationController {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         authenticationService.refreshToken(request,response);
     }
+
+
 
 
 }
