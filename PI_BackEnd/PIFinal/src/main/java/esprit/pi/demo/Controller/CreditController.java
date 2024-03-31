@@ -115,7 +115,7 @@ public class CreditController {
     @GetMapping("/QRCode/{id}")
     public String getQRCode(Model model,int id){
         String credit="http://localhost:8081/MonthlyPayment/MonthlyPayment/creditNum/"+id;
-        String QR_CODE_IMAGE_PATH = "./Assets/images/Credit_"+id+".png";
+        String QR_CODE_IMAGE_PATH = "./Assets/images/QR/Credit_"+id+".png";
 
 
         byte[] image = new byte[0];

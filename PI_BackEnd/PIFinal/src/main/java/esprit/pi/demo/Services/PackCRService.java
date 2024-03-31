@@ -70,7 +70,6 @@ public class PackCRService implements IPackCRService {
     p.setNomImage(originalFileName);
 
     File convertFile = new File("C:/Users/nermi/" + imgGeneratedId + file.getOriginalFilename());
-        //Post foundPost = postRepository.findFirstByOrderByIdPostDesc();
         p.setImage("./Assets/images/" + imgGeneratedId + file.getOriginalFilename());
         convertFile.createNewFile();
         FileOutputStream fout = new FileOutputStream(convertFile);
