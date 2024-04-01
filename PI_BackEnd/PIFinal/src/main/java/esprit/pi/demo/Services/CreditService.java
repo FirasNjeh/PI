@@ -272,7 +272,7 @@ return credit;
         Credit c=getCreditById(id);
         User user=c.getUserCR();
         int nbmois=c.getDuree()*12;
-        double taux=0.23;
+        double taux =c.getTauxInteret();
         double tauxMensuel = taux / 12;
         double MaxCredit=((user.getSalaire()*0.43)*(1 - Math.pow(1 + tauxMensuel, -nbmois))) / tauxMensuel; //0.43 ratio d'endettement entre 33% et 43%
         return MaxCredit;
@@ -611,8 +611,7 @@ return credit;
 
 
 
-//
-//
+
 //    @Override
 //    public double CalculActifCredit() {
 //
