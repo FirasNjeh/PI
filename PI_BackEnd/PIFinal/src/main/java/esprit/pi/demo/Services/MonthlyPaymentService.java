@@ -68,7 +68,10 @@ public class MonthlyPaymentService implements IMonthlyPaymentService {
            //montant restant à payer
             c.setMontantRestant(c.getMontant()- mp.getMontant());
             if(c.getMontantRestant()==0)
-            {String tomail="nerminenafti@gmail.com";
+            {c.setStatusCredit(StatusCredit.CLOTURE);
+                c.getUserCR().setNbr_credit(c.getUserCR().getNbr_credit()-1);
+
+                String tomail="nerminenafti@gmail.com";
                 String subject="Credit Cloturé";
                 String body ="Votre credit a ete cloturé! Vous avez payé tout votre crédit nshlh mabrouk ";
                 try { cr.sendEmail(tomail,subject,body);} catch (MessagingException e ) {e.printStackTrace();}}

@@ -29,9 +29,7 @@ import java.nio.file.Path;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 
 @AllArgsConstructor
@@ -67,11 +65,13 @@ public class CreditService implements ICreditService {
         credit.setPackCredit(p.getPackCredit());
         credit.setStatusCredit(StatusCredit.EN_ATTENTE);
 
+        float montant = credit.getMontant();
+        repository.save(credit);
     //si credit approuvé
-        if(u.getNbr_credit()<=2)
+        if((u.getNbr_credit()<=2) &&(montant<MaxCredit(credit.getId())) && (montant<pa.getPackCRById(idp).getMontantMax()))
         {
         credit.setStatusCredit(StatusCredit.APPROUVE);
-        float montant = credit.getMontant();
+
 
         //date d'ajout du credit
         credit.setDateDeb(LocalDate.now());
@@ -536,6 +536,78 @@ return credit;
         byte[] pngData = pngOutputStream.toByteArray();
         return pngData;
     }
+
+    //statistiques
+    @Override
+    public int NbrCredit() {
+        return repository.countByStatusCreditEquals(StatusCredit.APPROUVE);
+    }
+
+    @Override
+    public int NbrCreditPack(PackCredit pack) {
+        return repository.countByPackCredit(pack);
+    }
+
+    @Override
+    public int NbrCreditCloture() {
+        return repository.countByStatusCreditEquals(StatusCredit.CLOTURE);
+    }
+
+    @Override
+    public PackCredit mostDemandedPack() {
+        List<Credit> allCredits = repository.findAll();
+
+        Map<PackCredit, Long> packCountMap = new HashMap<>();
+        for (Credit credit : allCredits) {
+            PackCredit pack = credit.getPackCredit();
+            packCountMap.put(pack, packCountMap.getOrDefault(pack, 0L) + 1);
+        }
+
+        // Trouver le pack avec le nombre le plus élevé
+        PackCredit mostDemandedPack = null;
+        long maxCount = 0;
+        for (Map.Entry<PackCredit, Long> entry : packCountMap.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                mostDemandedPack = entry.getKey();
+            }
+        }
+
+        return mostDemandedPack;
+    }
+
+    @Override
+    public Float TotalLoan() {
+        List<Credit> allCredits = repository.findAll();
+        Float creditAmounts = 0.0f;
+
+        for (Credit credit : allCredits) {
+            creditAmounts+=credit.getMontant();
+        }
+        return creditAmounts;
+    }
+
+    @Override
+    public double calculateDefaultRate() {
+        List<Credit> allCredits = repository.findAll();
+        int totalCredits = allCredits.size();
+        int latePayments = 0;
+
+        for (Credit credit : allCredits) {
+            if (credit.getLateTimes() > 0) {
+                latePayments++;
+            }
+        }
+
+        if (totalCredits == 0) {
+            return 0.0; // Pour éviter une division par zéro
+        } else {
+            return (double) latePayments / totalCredits * 100;
+        }
+    }
+
+
+
 
 
 

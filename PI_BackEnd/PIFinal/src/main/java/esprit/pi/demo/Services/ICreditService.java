@@ -2,6 +2,7 @@ package esprit.pi.demo.Services;
 
 import com.google.zxing.WriterException;
 import esprit.pi.demo.entities.Credit;
+import esprit.pi.demo.entities.PackCredit;
 import esprit.pi.demo.entities.StatusCredit;
 
 import java.io.IOException;
@@ -57,6 +58,19 @@ public interface ICreditService {
             throws WriterException, IOException;
 
     byte[] getQRCodeImage(String text, int width, int height) throws WriterException, IOException;
+
+    //statistiques
+    int NbrCredit();
+
+    int NbrCreditPack(PackCredit pack);
+
+    int NbrCreditCloture();
+
+    PackCredit mostDemandedPack();
+
+    Float TotalLoan();
+
+    double calculateDefaultRate();
 
 
 //    double CalculActifCredit();

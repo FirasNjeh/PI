@@ -4,6 +4,7 @@ import ch.qos.logback.core.model.Model;
 import com.google.zxing.WriterException;
 import esprit.pi.demo.Services.ICreditService;
 import esprit.pi.demo.entities.Credit;
+import esprit.pi.demo.entities.PackCredit;
 import esprit.pi.demo.entities.StatusCredit;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -135,7 +136,37 @@ public class CreditController {
         return "qrcode généré avec succès";
     }
 
+    //Statistiques
 
 
+    @GetMapping("/Stat/NbrCredit")
+    public int NbrCredit() {
+        return service.NbrCredit();
+    }
+
+    @GetMapping("/Stat/NbrCredit/Pack")
+    public int NbrCreditPack(@PathVariable PackCredit pack) {
+        return service.NbrCreditPack(pack);
+    }
+
+    @GetMapping("/Stat/NbrCredit/Cloture")
+    public int NbrCreditCloture() {
+        return service.NbrCreditCloture();
+    }
+
+    @GetMapping("/Stat/MostDemandedPack")
+    public PackCredit mostDemandedPack() {
+        return service.mostDemandedPack();
+    }
+
+    @GetMapping("/Stat/TotalLoan")
+    public Float TotalLoan() {
+        return service.TotalLoan();
+    }
+
+    @GetMapping("/Stat/NbrRetard")
+    public double calculateDefaultRate() {
+        return service.calculateDefaultRate();
+    }
 }
 

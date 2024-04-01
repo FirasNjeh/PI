@@ -1,6 +1,7 @@
 package esprit.pi.demo.Repository;
 
 import esprit.pi.demo.entities.Credit;
+import esprit.pi.demo.entities.PackCredit;
 import esprit.pi.demo.entities.StatusCredit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,8 @@ public interface CreditRepository extends JpaRepository<Credit,Integer>
 
     List<Credit> getCreditByMontantLessThan(float m);
     List<Credit> getCreditByMontantGreaterThan(float m);
+    int countByStatusCreditEquals(StatusCredit statusCredit);
+    int countByPackCredit(PackCredit packCredit);
 
 //    @Query(value = "SELECT * FROM credit c WHERE YEAR(c.date_deb) =?1",nativeQuery = true)
 //    List<Credit> creditParAnnee(int annnee);
