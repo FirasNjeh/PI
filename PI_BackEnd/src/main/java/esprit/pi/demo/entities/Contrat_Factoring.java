@@ -1,5 +1,8 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.DelaiPaiement;
+import esprit.pi.demo.entities.Enumeration.Historique;
+import esprit.pi.demo.entities.Enumeration.Solvabilite;
 import jakarta.persistence.*;
 import lombok.*;
 

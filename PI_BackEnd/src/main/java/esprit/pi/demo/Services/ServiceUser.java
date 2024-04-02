@@ -1,13 +1,24 @@
 package esprit.pi.demo.Services;
 
+import esprit.pi.demo.DTO.AgeGroupStatisticsDTO;
+import esprit.pi.demo.DTO.ChangePasswordRequest;
+import esprit.pi.demo.DTO.GenderStatisticsDTO;
+import esprit.pi.demo.DTO.UpdateUserRequest;
 import esprit.pi.demo.Repository.UserRepository;
+import esprit.pi.demo.entities.Enumeration.Genre;
 import esprit.pi.demo.entities.User;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -15,6 +26,7 @@ import java.util.stream.Collectors;
 public class ServiceUser implements IServiceUser {
 
   private UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
     @Override
     public User creer(User user) {
         user.setAge(calculateAge(user.getDateNaissance()));
@@ -38,17 +50,16 @@ public class ServiceUser implements IServiceUser {
             user1.setDateNaissance(user.getDateNaissance());
             user1.setNumtel(user.getNumtel());
             user1.setEmail(user.getEmail());
-            user1.setMdp(user.getMdp());
             user1.setProfession(user.getProfession());
             user1.setRole(user.getRole());
-            user1.setNbr_credit(user.getNbr_credit());
             user1.setImage(user.getImage());
             user1.setSalaire(user.getSalaire());
-            user.setMatricule_fiscale(user.getMatricule_fiscale());
+            user.setMatriculeFiscale(user.getMatriculeFiscale());
             return userRepository.save(user1);
 
         }).orElse(null);
     }
+
 
     @Override
     public String supprimer(int id) {
@@ -58,38 +69,45 @@ public class ServiceUser implements IServiceUser {
 
     @Override
     public List<User> trierUtilisateurParNom() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparing(User::getNom)).
+        List<User> users=userRepository.findAll();
+        return users.stream().sorted(Comparator.comparing(User::getNom)).
                 collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParPrenom() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparing(User::getPrenom)).
+        List<User> users=userRepository.findAll();
+        return users.stream().sorted(Comparator.comparing(User::getPrenom)).
                 collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParSalaireCroissant() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparingDouble(User::getSalaire)).
+        List<User> users =userRepository.findAll();
+        return users.stream().sorted(Comparator.comparingDouble(User::getSalaire)).
                 collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParSalaireDecroissant() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparingDouble(User::getSalaire).reversed())
+        List<User> users =userRepository.findAll();
+        return users.stream().sorted(Comparator.comparingDouble(User::getSalaire).reversed())
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParAge() {
-        List<User> utilisateurs = userRepository.findAll();
-        return utilisateurs.stream()
+        List<User> users = userRepository.findAll();
+        return users.stream()
                 .sorted(Comparator.comparingInt(user -> calculateAge(user.getDateNaissance())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> trierUtilisateurParRole() {
+        List<User> users =userRepository.findAll();
+        return users.stream().sorted(Comparator.comparing(User::getRole)).
+                collect(Collectors.toList());
     }
 
     @Override
@@ -102,7 +120,137 @@ public class ServiceUser implements IServiceUser {
         return userRepository.findByPrenomLike(prenom);
     }
 
-    private int calculateAge(LocalDate dateNaissance) {
+    @Override
+    public List<User> findByPrenomAndNom(String prenom,String nom) {
+        return userRepository.findByPrenomLikeAndNomLike(prenom,nom);
+    }
+
+    @Override
+    public User findByCinLike(int cin) {
+        return userRepository.findByCin(cin);
+    }
+
+    @Override
+    public User findByMatricule_fiscale(int matriculeFiscale) {
+        return userRepository.findByMatriculeFiscale(matriculeFiscale);
+    }
+
+    @Override
+    public double calculerAgeMoyenUsers() {
+        return userRepository.calculerAgeMoyen();
+    }
+
+    @Override
+    public GenderStatisticsDTO obtenirStatistiquesGenre() {
+        List<User> users = userRepository.findAll();
+        long totalUsers = users.size();
+        long hommes = users.stream()
+                .filter(user -> user.getGenre() == Genre.HOMME)
+                .count();
+        double pourcentageHommes = (hommes * 100.0) / totalUsers;
+        double pourcentageFemmes = 100.0 - pourcentageHommes;
+
+        return new GenderStatisticsDTO(pourcentageHommes, pourcentageFemmes);
+    }
+
+    @Override
+    public AgeGroupStatisticsDTO obtenirStatistiquesTranchesAge() {
+        List<User> users = userRepository.findAll();
+        long totalUsers = users.size();
+
+        long jeunesAdultes = users.stream()
+                .filter(user -> user.getAge() >= 18 && user.getAge() <= 35)
+                .count();
+        long adultes = users.stream()
+                .filter(user -> user.getAge() > 35 && user.getAge() <= 65)
+                .count();
+        long ainesTroisiemeAge = users.stream()
+                .filter(user -> user.getAge() > 65 && user.getAge() <= 80)
+                .count();
+        long ainesQuatriemeAge = users.stream()
+                .filter(user -> user.getAge() > 80)
+                .count();
+        double pourcentageJeunesAdultes = (jeunesAdultes * 100.0) / totalUsers;
+        double pourcentageAdultes = (adultes * 100.0) / totalUsers;
+        double pourcentageAinesTroisiemeAge = (ainesTroisiemeAge * 100.0) / totalUsers;
+        double pourcentageAinesQuatriemeAge = (ainesQuatriemeAge * 100.0) / totalUsers;
+
+        return new AgeGroupStatisticsDTO(pourcentageJeunesAdultes, pourcentageAdultes, pourcentageAinesTroisiemeAge, pourcentageAinesQuatriemeAge);
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
+        var user= (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
+            throw new IllegalStateException("Wrong Password");
+        }
+        if(!request.getNewPassword().equals(request.getConfirmationPassword())){
+            throw new IllegalStateException("Password are not the same");
+        }
+        user.setMdp(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void banUser(int userId) {
+        Optional<User> optionalUser =userRepository.findById(userId);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            user.setBanni(true);
+            userRepository.save(user);
+        }
+        else {
+            throw new EntityNotFoundException("Utilisateur inexistant : " + userId);
+        }
+    }
+
+    @Override
+    public void debanUser(int userId) {
+
+        Optional<User> optionalUser =userRepository.findById(userId);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            user.setBanni(false);
+            userRepository.save(user);
+        }
+        else {
+            throw new EntityNotFoundException("Utilisateur inexistant " );
+        }
+
+    }
+
+    @Override
+    public User getCurrentUser(Principal connectedUser) {
+        if (connectedUser instanceof UsernamePasswordAuthenticationToken) {
+            Object principal = ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+            if (principal instanceof UserDetails) {
+                return (User) principal;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void updateCurrentUser(Principal connectedUser, UpdateUserRequest updatedUser) {
+        User currentUser=getCurrentUser(connectedUser);
+        if(updatedUser.getNom() != null) currentUser.setNom(updatedUser.getNom());
+        if(updatedUser.getPrenom() != null) currentUser.setPrenom(updatedUser.getPrenom());
+        if(updatedUser.getEmail() != null) currentUser.setEmail(updatedUser.getEmail());
+        if(updatedUser.getCin() != -1) currentUser.setCin(updatedUser.getCin());
+        if(updatedUser.getDateNaissance() != null) currentUser.setDateNaissance(updatedUser.getDateNaissance());
+        if(updatedUser.getNumtel() != -1) currentUser.setNumtel(updatedUser.getNumtel());
+        if(updatedUser.getProfession() != null) currentUser.setProfession(updatedUser.getProfession());
+        if(updatedUser.getSalaire() != -1) currentUser.setSalaire(updatedUser.getSalaire());
+        if(updatedUser.getAge() != -1)
+            if (updatedUser.getDateNaissance() != null) {
+            currentUser.setAge(calculateAge(updatedUser.getDateNaissance()));
+        }
+        userRepository.save(currentUser) ;
+    }
+
+
+
+    public int calculateAge(LocalDate dateNaissance) {
         LocalDate currentDate = LocalDate.now();
         int age = currentDate.getYear() - dateNaissance.getYear();
         if (dateNaissance.getMonthValue() > currentDate.getMonthValue() ||
