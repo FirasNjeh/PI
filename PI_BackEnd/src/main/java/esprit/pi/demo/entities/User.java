@@ -56,9 +56,7 @@ public class User implements UserDetails {
     @ToString.Exclude
     @OneToMany (mappedBy = "userCR")
     private List<Credit> credits;
-    @ToString.Exclude
-    @OneToMany (mappedBy = "userNotif")
-    private List<Notification> notifications;
+    
     @ToString.Exclude
    @OneToMany(mappedBy = "userReclamation")
     private List<Reclamation> reclamations;

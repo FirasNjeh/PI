@@ -19,10 +19,10 @@ public class Portefeuille implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private float montant;
-    private LocalDate date_creation;
+    private LocalDate date_creation=LocalDate.now();
     private int rib;
     @Enumerated(EnumType.STRING)
-    private StatusPF statuspf;
+    private StatusPF statuspf=StatusPF.ACTIVE;
     @ToString.Exclude
     @OneToMany(mappedBy = "portefeuilleTransaction")
     private List<TransactionCredit> transactions;

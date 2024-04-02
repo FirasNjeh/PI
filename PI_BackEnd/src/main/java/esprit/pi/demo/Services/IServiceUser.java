@@ -14,6 +14,7 @@ public interface IServiceUser {
     List<User> lire();
     User getUserById (int id);
     String supprimer(int id);
+    User modifier(int id, User user);
     List <User> trierUtilisateurParNom();
     List <User> trierUtilisateurParPrenom();
     List <User> trierUtilisateurParSalaireCroissant();
@@ -35,11 +36,6 @@ public interface IServiceUser {
 
     User getCurrentUser(Principal connectedUser) ;
     void updateCurrentUser(Principal connectedUser, UpdateUserRequest updatedUser);
-
-
-
-
-
 
 
 }

@@ -8,7 +8,9 @@ import esprit.pi.demo.entities.User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 @AllArgsConstructor
@@ -33,4 +35,5 @@ public class UserController {
             serviceUser.updateCurrentUser(connectedUser,updatedUser);
         return ResponseEntity.ok().build() ;
     }
+
 }

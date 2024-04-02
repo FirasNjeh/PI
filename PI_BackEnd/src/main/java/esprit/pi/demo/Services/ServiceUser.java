@@ -40,6 +40,25 @@ public class ServiceUser implements IServiceUser {
     public User getUserById (int id){
         return userRepository.findById(id).orElse(null);
     }
+    @Override
+    public User modifier(int id, User user) {
+        return userRepository.findById(id).map(user1 -> {
+            user1.setNom(user.getNom());
+            user1.setPrenom(user.getPrenom());
+            user1.setCin(user.getCin());
+            user1.setAdresse(user.getAdresse());
+            user1.setDateNaissance(user.getDateNaissance());
+            user1.setNumtel(user.getNumtel());
+            user1.setEmail(user.getEmail());
+            user1.setProfession(user.getProfession());
+            user1.setRole(user.getRole());
+            user1.setImage(user.getImage());
+            user1.setSalaire(user.getSalaire());
+            user.setMatriculeFiscale(user.getMatriculeFiscale());
+            return userRepository.save(user1);
+
+        }).orElse(null);
+    }
 
 
     @Override
@@ -50,44 +69,44 @@ public class ServiceUser implements IServiceUser {
 
     @Override
     public List<User> trierUtilisateurParNom() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparing(User::getNom)).
+        List<User> users=userRepository.findAll();
+        return users.stream().sorted(Comparator.comparing(User::getNom)).
                 collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParPrenom() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparing(User::getPrenom)).
+        List<User> users=userRepository.findAll();
+        return users.stream().sorted(Comparator.comparing(User::getPrenom)).
                 collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParSalaireCroissant() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparingDouble(User::getSalaire)).
+        List<User> users =userRepository.findAll();
+        return users.stream().sorted(Comparator.comparingDouble(User::getSalaire)).
                 collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParSalaireDecroissant() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparingDouble(User::getSalaire).reversed())
+        List<User> users =userRepository.findAll();
+        return users.stream().sorted(Comparator.comparingDouble(User::getSalaire).reversed())
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParAge() {
-        List<User> utilisateurs = userRepository.findAll();
-        return utilisateurs.stream()
+        List<User> users = userRepository.findAll();
+        return users.stream()
                 .sorted(Comparator.comparingInt(user -> calculateAge(user.getDateNaissance())))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<User> trierUtilisateurParRole() {
-        List<User> utilisateurs=userRepository.findAll();
-        return utilisateurs.stream().sorted(Comparator.comparing(User::getRole)).
+        List<User> users =userRepository.findAll();
+        return users.stream().sorted(Comparator.comparing(User::getRole)).
                 collect(Collectors.toList());
     }
 
@@ -174,23 +193,23 @@ public class ServiceUser implements IServiceUser {
 
     @Override
     public void banUser(int userId) {
-        Optional<User> optionaluser =userRepository.findById(userId);
-        if(optionaluser.isPresent()){
-            User user = optionaluser.get();
+        Optional<User> optionalUser =userRepository.findById(userId);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
             user.setBanni(true);
             userRepository.save(user);
         }
         else {
-            throw new EntityNotFoundException("Utilisateur non trouvé avec l'ID : " + userId);
+            throw new EntityNotFoundException("Utilisateur inexistant : " + userId);
         }
     }
 
     @Override
     public void debanUser(int userId) {
 
-        Optional<User> optionaluser =userRepository.findById(userId);
-        if(optionaluser.isPresent()){
-            User user = optionaluser.get();
+        Optional<User> optionalUser =userRepository.findById(userId);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
             user.setBanni(false);
             userRepository.save(user);
         }
@@ -228,6 +247,7 @@ public class ServiceUser implements IServiceUser {
         }
         userRepository.save(currentUser) ;
     }
+
 
 
     public int calculateAge(LocalDate dateNaissance) {

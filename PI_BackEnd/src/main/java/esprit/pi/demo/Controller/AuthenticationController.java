@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @AllArgsConstructor
@@ -30,6 +31,8 @@ public class AuthenticationController {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         authenticationService.refreshToken(request,response);
     }
+
+
 
 
 

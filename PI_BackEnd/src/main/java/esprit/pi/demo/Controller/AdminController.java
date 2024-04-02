@@ -24,6 +24,14 @@ public class AdminController {
     public User findUserById (@PathVariable int id){
         return serviceUser.getUserById(id);
     }
+    @PostMapping("/create")
+    public User create(@RequestBody User user){
+        return serviceUser.creer(user);
+    }
+    @PutMapping("/update/{id}")
+    public User update(@PathVariable int id,@RequestBody User user){
+        return serviceUser.modifier(id, user);
+    }
     @PostMapping("/ban/{userId}")
     public void banUser(@PathVariable int userId) {
         serviceUser.banUser(userId);

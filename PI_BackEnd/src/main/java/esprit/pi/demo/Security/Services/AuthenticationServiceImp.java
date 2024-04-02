@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import esprit.pi.demo.DTO.AuthenticationRequest;
 import esprit.pi.demo.DTO.AuthenticationResponse;
 import esprit.pi.demo.DTO.RegisterRequest;
+import esprit.pi.demo.Repository.PortefeuilleRepository;
 import esprit.pi.demo.Repository.TokenRepository;
 import esprit.pi.demo.Repository.UserRepository;
 import esprit.pi.demo.Security.Jwt.JwtService;
+import esprit.pi.demo.Services.EmailService;
+import esprit.pi.demo.entities.Portefeuille;
 import esprit.pi.demo.entities.Token;
 import esprit.pi.demo.entities.Enumeration.TokenType;
 import esprit.pi.demo.entities.User;
@@ -29,6 +32,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final PortefeuilleRepository portefeuilleRepository;
+    private EmailService emailService;
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
@@ -47,7 +52,15 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .age(calculateAge(request.getDateNaissance()))
                 .banni(false)
                 .build();
+
         var savedUser = userRepository.save(user);
+        Portefeuille portefeuille = new Portefeuille();
+        portefeuille.setUser(savedUser);
+        portefeuilleRepository.save(portefeuille);
+        String to = savedUser.getEmail();
+        String subject = "Confirmation d'inscription";
+        String text = "Bonjour " + savedUser.getNom() + ",\n\nVotre inscription à notre site FundHub a été confirmée avec succès.";
+        emailService.sendEmail(to, subject, text);
         var jwtToken = jwtService.generateToken(user);
         saveUserToken(savedUser, jwtToken);
         var refreshToken =jwtService.generateRefreshToken(user) ;
