@@ -1,0 +1,5 @@
+package esprit.pi.demo.entities.Enumeration;
+
+public enum PackCredit {
+    ENTREPREUNARIAT,AGRICULTURE,ELEVAGE,EDUCATION,URGENCE_FINANCIERE,FORMATION,PROFESSIONNEL
+}
