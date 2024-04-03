@@ -2,11 +2,9 @@ package esprit.pi.demo.Controller;
 
 import esprit.pi.demo.Services.IFileService;
 import esprit.pi.demo.Services.ISinistreAssurance;
-import esprit.pi.demo.Services.SinistreService;
 
 import esprit.pi.demo.dto.ResponseFile;
 import esprit.pi.demo.dto.ResponseMessage;
-import esprit.pi.demo.entities.Assurance;
 import esprit.pi.demo.entities.Sinistre;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -5,8 +5,6 @@ import esprit.pi.demo.Services.IPackAssurService;
 import esprit.pi.demo.dto.ResponseFile;
 import esprit.pi.demo.dto.ResponseMessage;
 import esprit.pi.demo.entities.PackAssur;
-import esprit.pi.demo.entities.PackAssurance;
-import esprit.pi.demo.entities.PackCR;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
