@@ -24,6 +24,7 @@ public class File {
     private String type;
 
     @Lob
+    @Column(length = 1000000, columnDefinition = "LONGBLOB")
     private byte[] data;
     @JsonIgnore
     @ManyToOne

@@ -23,6 +23,10 @@ public class User implements Serializable {
     private String prenom;
     private int cin;
     private LocalDate dateNaissance;
+    private int age;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
     private int numtel;
     private String email;
     private String adresse;

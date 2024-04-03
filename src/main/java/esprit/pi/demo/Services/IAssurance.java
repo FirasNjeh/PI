@@ -3,7 +3,7 @@ import esprit.pi.demo.dto.AgricoleAssuranceDTO;
 import esprit.pi.demo.dto.EntrepreneurAssuranceDTO;
 import esprit.pi.demo.dto.SanteAssuranceDTO;
 import esprit.pi.demo.dto.ScolaireAssuranceDTO;
-import esprit.pi.demo.entities.Assurance;
+import esprit.pi.demo.entities.*;
 
 import java.util.List;
 import java.util.Set;
@@ -31,18 +31,34 @@ public interface IAssurance {
     Set<Assurance> getListAssurancesByPackAssur(int idpack);
 
     Set<Assurance> getListAssurancesByUser(int iduser);
+    Long countAssurancesByUser(int userId);
 
-    Assurance createAssuranceWithPackAssur(int packId, Assurance assurance);
+    Long countAssurancesByUserLastNYear(Integer userId, Integer n);
 
-    Assurance createScolaireAssurance(int packId, ScolaireAssuranceDTO scolaireAssuranceDTO);
+    Long countSinistresByUser(int userId);
 
-    Assurance createEntrepreneurAssurance(int packId, EntrepreneurAssuranceDTO entrepreneurAssuranceDTO);
+    Long countSinistresByPackAssurId(int idpack);
 
-    Assurance createSanteAssurance(int packId, SanteAssuranceDTO santeAssuranceDTO);
+    Long countSinistresByUserLastNYear(int userId, int n);
 
-    Assurance createAgricoleAssurance(int packId, AgricoleAssuranceDTO agricoleAssuranceDTO);
 
-    Assurance createAssuranceWithPackAssurandUser(int iduser, int packId, Assurance assurance);
+    Assurance createScolaireAssurance(int iduser, int packId, ScolaireAssuranceDTO scolaireAssuranceDTO);
+
+    Assurance createEntrepreneurAssurance(int iduser, int packId, EntrepreneurAssuranceDTO entrepreneurAssuranceDTO);
+
+    Assurance createSanteAssurance(int iduser, int packId, SanteAssuranceDTO santeAssuranceDTO);
+
+    Assurance createAgricoleAssurance(int iduser, int packId, AgricoleAssuranceDTO agricoleAssuranceDTO);
+
+    float CalculScolairePrime(float capitalescolaire_assuré);
+
+
+    float CalculENTREPRENEURPrime(TypeAssuranceEntrep typeAssuranceEntrep, BienAssuré bienAssuré,int idpack);
+
+    float CalculSANTEPrime(TypeAssuranceSante typeAssuranceSante, int age, Gender gender);
+
+    float CalculAgriculturePrime(float capitalAgricole_assuré, TypeAgriculture typeAgriculture);
+
 
     // Assurance updateAssurance(int id , Assurance assurance);
 

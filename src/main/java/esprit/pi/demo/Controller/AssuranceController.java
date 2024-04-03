@@ -2,7 +2,7 @@ package esprit.pi.demo.Controller;
 
 
 import esprit.pi.demo.Services.IAssurance;
-import esprit.pi.demo.entities.Assurance;
+import esprit.pi.demo.entities.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -63,33 +63,70 @@ public class AssuranceController {
 //        return ResponseEntity.ok(createdAssurance);
 //    }
 
-    @PostMapping("/create-scolaire-assurance/{packId}")
-    public Assurance createScolaireAssurance(@PathVariable int packId, @RequestBody ScolaireAssuranceDTO scolaireAssuranceDTO) {
-        return service.createScolaireAssurance(packId, scolaireAssuranceDTO);
+    @PostMapping("/create-scolaire-assurance")
+    public Assurance createScolaireAssurance(  @RequestParam("userId") int userId,
+                                               @RequestParam("packId") int packId,
+                                               @RequestBody ScolaireAssuranceDTO scolaireAssuranceDTO) {
+        return service.createScolaireAssurance(userId,packId, scolaireAssuranceDTO);
     }
 
-    @PostMapping("/create-entrepreneur-assurance/{packId}")
-    public Assurance createEntrepreneurAssurance(@PathVariable int packId, @RequestBody EntrepreneurAssuranceDTO entrepreneurAssuranceDTO) {
-        return service.createEntrepreneurAssurance(packId, entrepreneurAssuranceDTO);
+    @PostMapping("/create-entrepreneur-assurance")
+    public Assurance createEntrepreneurAssurance(  @RequestParam("userId") int userId,
+                                                   @RequestParam("packId") int packId,
+                                                   @RequestBody EntrepreneurAssuranceDTO entrepreneurAssuranceDTO) {
+        return service.createEntrepreneurAssurance(userId,packId, entrepreneurAssuranceDTO);
     }
 
-    @PostMapping("/create-sante-assurance/{packId}")
-    public Assurance createSanteAssurance(@PathVariable int packId, @RequestBody SanteAssuranceDTO santeAssuranceDTO) {
-        return service.createSanteAssurance(packId, santeAssuranceDTO);
+    @PostMapping("/create-sante-assurance")
+    public Assurance createSanteAssurance(  @RequestParam("userId") int userId,
+                                            @RequestParam("packId") int packId,
+                                            @RequestBody SanteAssuranceDTO santeAssuranceDTO) {
+        return service.createSanteAssurance(userId,packId, santeAssuranceDTO);
     }
 
-    @PostMapping("/create-agricole-assurance/{packId}")
-    public Assurance createAgricoleAssurance(@PathVariable int packId, @RequestBody AgricoleAssuranceDTO agricoleAssuranceDTO) {
-        return service.createAgricoleAssurance(packId, agricoleAssuranceDTO);
+    @PostMapping("/create-agricole-assurance")
+    public Assurance createAgricoleAssurance(  @RequestParam("userId") int userId,
+                                               @RequestParam("packId") int packId,
+                                               @RequestBody AgricoleAssuranceDTO agricoleAssuranceDTO) {
+        return service.createAgricoleAssurance(userId,packId, agricoleAssuranceDTO);
     }
 
-    @PostMapping("/createWithPackAndUser")
-    public ResponseEntity<Assurance> createAssuranceWithPackAndUser(
-            @RequestParam("userId") int userId,
-            @RequestParam("packId") int packId,
-            @RequestBody Assurance assurance) {
-
-        Assurance createdAssurance = service.createAssuranceWithPackAssurandUser(userId, packId, assurance);
-        return new ResponseEntity<>(createdAssurance, HttpStatus.CREATED);
+    @GetMapping("/countAssurancesByUserLastNYear/{userId}/{n}")
+    public Long countAssurancesByUserLastNYear(@PathVariable Integer userId, @PathVariable Integer n) {
+        return service.countAssurancesByUserLastNYear(userId, n);
     }
+
+    @GetMapping("/countSinistresByUserLastNYear/{userId}/{n}")
+    public Long countSinistresByUserLastNYear(@PathVariable int userId, @PathVariable int n) {
+        return service.countSinistresByUserLastNYear(userId, n);
+    }
+
+    @GetMapping("/calculScolairePrime")
+    public float calculScolairePrime(@RequestParam("capitalescolaire_assure") float capitalescolaire_assure) {
+        return service.CalculScolairePrime(capitalescolaire_assure);
+    }
+
+    @GetMapping("/calculENTREPRENEURPrime")
+    public float calculENTREPRENEURPrime(
+            @RequestParam("typeAssuranceEntrep") TypeAssuranceEntrep typeAssuranceEntrep,
+            @RequestParam("bienAssure") BienAssuré bienAssuré,
+            @RequestParam("idpack") int idpack) {
+        return service.CalculENTREPRENEURPrime(typeAssuranceEntrep, bienAssuré, idpack);
+    }
+
+    @GetMapping("/calculSANTEPrime")
+    public float calculSANTEPrime(
+            @RequestParam("typeAssuranceSante") TypeAssuranceSante typeAssuranceSante,
+            @RequestParam("age") int age,
+            @RequestParam("gender") Gender gender) {
+        return service.CalculSANTEPrime(typeAssuranceSante, age, gender);
+    }
+
+    @GetMapping("/calculAgriculturePrime")
+    public float calculAgriculturePrime(
+            @RequestParam("capitalAgricole_assure") float capitalAgricole_assure,
+            @RequestParam("typeAgriculture") TypeAgriculture typeAgriculture) {
+        return service.CalculAgriculturePrime(capitalAgricole_assure, typeAgriculture);
+    }
+
 }

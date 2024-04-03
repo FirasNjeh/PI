@@ -48,11 +48,14 @@ public class PackAssurService implements IPackAssurService {
             existingPackAssur.setPackAssurance(packAssur.getPackAssurance());
             existingPackAssur.setNom(packAssur.getNom());
             existingPackAssur.setDescription(packAssur.getDescription());
-            existingPackAssur.setPrime(packAssur.getPrime());
+            existingPackAssur.setPrimeMin(packAssur.getPrimeMin());
+            existingPackAssur.setPrimeMax(packAssur.getPrimeMax());
 
             return repository.save(existingPackAssur);
 
         }
+
+        // Esm Packassur + Nombre de contrats assurances
     @Override
     public Map<String, Integer> getPackAssurAssuranceCounts() {
         List<PackAssur> packAssurs = repository.findAll();
@@ -66,6 +69,8 @@ public class PackAssurService implements IPackAssurService {
                 ));
     }
 
+    // Esm Packassur le plus vendu
+    @Override
     public String findPackAssurNomWithMostAssurances() {
         Map<String, Integer> packAssurAssuranceCounts = getPackAssurAssuranceCounts();
 
@@ -76,6 +81,8 @@ public class PackAssurService implements IPackAssurService {
         return entryWithMaxAssurances != null ? entryWithMaxAssurances.getKey() : null;
     }
 
+    // Esm Packassur le moins vendu
+    @Override
     public String findPackAssurNomWithLeastAssurances() {
         Map<String, Integer> packAssurAssuranceCounts = getPackAssurAssuranceCounts();
 

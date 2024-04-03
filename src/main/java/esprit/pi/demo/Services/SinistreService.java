@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -38,14 +39,14 @@ public class SinistreService implements ISinistreAssurance {
     public Sinistre saveSinistre(Sinistre sinistre)
     {
          repository.save(sinistre);
-        String to = "maryembouchahoua@gmail.com";
+        String to = "maryembouchahoua@gmail.com"; // replace with the actual recipient email
         String subject = "New Sinistre Added";
         String body = "A new Sinistre has been added with details:";
 
         try {
             sendEmail(to, subject, body);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // handle the exception according to your application's needs
         }
 
         return sinistre;
@@ -85,7 +86,8 @@ public class SinistreService implements ISinistreAssurance {
     }
 
     private void sendEmail(String to, String subject, String body) throws MessagingException {
-
+        // Send an email
+        // ...
         String from = "techwork414@gmail.com";
         String password = "pacrvzlvscatwwkb";
 
@@ -119,6 +121,7 @@ public class SinistreService implements ISinistreAssurance {
     public Sinistre createSinistreWithAssurance(int idassur, Sinistre sinistre) {
         Assurance assurance = assurancerepository.findById(idassur)
                 .orElseThrow(() -> new RuntimeException("Assurance with id " + idassur + " not found"));
+        sinistre.setDateSinistre(new Date(System.currentTimeMillis()));
         sinistre.setEtatSinistre(EtatSinistre.EN_ATTENTE);
         sinistre.setAssurance(assurance);
         return repository.save(sinistre);
@@ -145,7 +148,7 @@ public class SinistreService implements ISinistreAssurance {
             transactionAssurance.setPortefeuilleTransactionA(userPortefeuille);
             transactionAssurancerepository.save(transactionAssurance);
         } else {
-            throw new RuntimeException("Portefeuille not found  " + user);
+            throw new RuntimeException("Portefeuille not found for user " + user);
         }
 
         return repository.save(sinistre);

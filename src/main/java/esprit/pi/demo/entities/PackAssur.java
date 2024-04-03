@@ -19,7 +19,9 @@ public class PackAssur implements Serializable {
     private int id;
     private String nom;
     private String description;
-    private float prime;
+    private float primeMin;
+    private float primeMax;
+
     @Enumerated(EnumType.STRING)
     private PackAssurance packAssurance;
     @JsonIgnore

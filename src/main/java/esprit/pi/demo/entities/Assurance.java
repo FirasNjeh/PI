@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -31,10 +30,11 @@ public class Assurance implements Serializable {
     //Agricole
     private String nom_exploitation_agricole;
     private String lieu_de_lexploitation;
-    private float surface_totale_exploitation;
+    private float motant_de_couverture_souhaite;
+    private float capitaleagricole_assuré;
+
     @Enumerated(EnumType.STRING)
     private TypeAgriculture typeagriculture;
-    private float motant_de_couverture_souhaite;
     @Enumerated(EnumType.STRING)
     private TypeDeCouverture typedecouverture;
 
@@ -42,12 +42,16 @@ public class Assurance implements Serializable {
     //Sante
     private String Condition_medicale ;
     @Enumerated(EnumType.STRING)
+    private TypeAssuranceSante typeAssuranceSante;
+    @Enumerated(EnumType.STRING)
     private NiveauDeCouverture niveauDeCouverture;
 
     //ENTREPRENEUR
     private String nom_entreprise;
     private String adresse_entreprise;
     private String activité_entreprise;
+    @Enumerated(EnumType.STRING)
+    private TypeAssuranceEntrep typeAssuranceEntrep;
     @Enumerated(EnumType.STRING)
     private BienAssuré bien_assuré;
     private String historique_de_sinistralite; //Préciser les sinistres antérieurs, le cas échéant, et les réparations effectuées
@@ -57,6 +61,8 @@ public class Assurance implements Serializable {
     //Scolaire
     private String nom_enfant;
     private String prenom_enfant;
+    private float capitalescolaire_assuré;
+
     private float montant_couverture;
 
 

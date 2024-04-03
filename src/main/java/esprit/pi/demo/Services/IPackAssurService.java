@@ -18,4 +18,8 @@ public interface IPackAssurService {
     PackAssur updatePackAssur(int id,PackAssur packAssur);
 
     Map<String, Integer> getPackAssurAssuranceCounts();
+
+    String findPackAssurNomWithMostAssurances();
+
+    String findPackAssurNomWithLeastAssurances();
 }
