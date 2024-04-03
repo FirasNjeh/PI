@@ -577,6 +577,29 @@ return credit;
     }
 
     @Override
+    public PackCredit LeastDemandedPack() {
+        List<Credit> allCredits = repository.findAll();
+
+        Map<PackCredit, Long> packCountMap = new HashMap<>();
+        for (Credit credit : allCredits) {
+            PackCredit pack = credit.getPackCredit();
+            packCountMap.put(pack, packCountMap.getOrDefault(pack, 0L) + 1);
+        }
+
+        // Trouver le pack avec le nombre le plus élevé
+        PackCredit leastDemandedPack = null;
+        long minCount = 0;
+        for (Map.Entry<PackCredit, Long> entry : packCountMap.entrySet()) {
+            if (entry.getValue() < minCount) {
+                minCount = entry.getValue();
+                leastDemandedPack = entry.getKey();
+            }
+        }
+
+        return leastDemandedPack;
+    }
+
+    @Override
     public Float TotalLoan() {
         List<Credit> allCredits = repository.findAll();
         Float creditAmounts = 0.0f;

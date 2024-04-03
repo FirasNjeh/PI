@@ -68,6 +68,8 @@ public interface ICreditService {
 
     PackCredit mostDemandedPack();
 
+    PackCredit LeastDemandedPack();
+
     Float TotalLoan();
 
     double calculateDefaultRate();

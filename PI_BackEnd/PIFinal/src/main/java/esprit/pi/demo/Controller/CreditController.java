@@ -159,6 +159,12 @@ public class CreditController {
         return service.mostDemandedPack();
     }
 
+    @GetMapping("/Stat/LeastDemandedPack")
+
+    public PackCredit LeastDemandedPack() {
+        return service.LeastDemandedPack();
+    }
+
     @GetMapping("/Stat/TotalLoan")
     public Float TotalLoan() {
         return service.TotalLoan();
