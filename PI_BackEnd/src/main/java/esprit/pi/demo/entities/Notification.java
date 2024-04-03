@@ -1,5 +1,7 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.StatusNotif;
+import esprit.pi.demo.entities.Enumeration.TypeNotif;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,5 +1,6 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.CategorieNews;
 import jakarta.persistence.*;
 import lombok.*;
 

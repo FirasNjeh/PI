@@ -1,5 +1,6 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.PackCredit;
 import jakarta.persistence.*;
 import lombok.*;
 

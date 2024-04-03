@@ -1,5 +1,6 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -52,6 +53,7 @@ public class User implements Serializable {
     @ToString.Exclude
     @OneToMany (mappedBy = "userNotif")
     private List<Notification> notifications;
+
     @ToString.Exclude
    @OneToMany(mappedBy = "userReclamation")
     private List<Reclamation> reclamations;

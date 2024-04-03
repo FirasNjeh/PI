@@ -1,11 +1,13 @@
 package esprit.pi.demo.entities;
 
+import esprit.pi.demo.entities.Enumeration.PriorityLevel;
+import esprit.pi.demo.entities.Enumeration.StatusRC;
+import esprit.pi.demo.entities.Enumeration.TypeRC;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
