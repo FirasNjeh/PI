@@ -50,6 +50,9 @@ public class User implements Serializable {
     @ToString.Exclude
     @OneToMany (mappedBy = "userCR")
     private List<Credit> credits;
+    @ToString.Exclude
+    @OneToMany (mappedBy = "userNotif")
+    private List<Notification> notifications;
 
     @ToString.Exclude
    @OneToMany(mappedBy = "userReclamation")
