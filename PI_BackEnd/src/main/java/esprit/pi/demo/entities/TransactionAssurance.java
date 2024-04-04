@@ -1,12 +1,12 @@
 package esprit.pi.demo.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import esprit.pi.demo.entities.Enumeration.TypeTransaction;
+import esprit.pi.demo.entities.Enumeration.TypeTransaction1;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,5 +18,15 @@ public class TransactionAssurance implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    //A REMPLIR
+  private LocalDate date;
+  private Long rib_source;
+  private Long rib_destination;
+  private float montant;
+  @Enumerated(EnumType.STRING)
+  private TypeTransaction typeTransaction;
+  @Enumerated(EnumType.STRING)
+  private TypeTransaction1 typeTransaction1;
+  @ToString.Exclude
+  @ManyToOne
+  private Portefeuille portefeuilleTransactionA;
 }

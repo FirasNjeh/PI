@@ -1,5 +1,6 @@
 package esprit.pi.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import esprit.pi.demo.entities.Enumeration.TypeTransaction;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,12 +18,13 @@ public class TransactionCredit implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private LocalDate date;
-    private Long rib_source;
-    private Long rib_destination;
+    private int rib_source;
+    private int rib_destination;
     private float montant;
     @Enumerated(EnumType.STRING)
     private TypeTransaction typeTransaction;
     @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     private Portefeuille portefeuilleTransaction;
 }

@@ -1,5 +1,6 @@
 package esprit.pi.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import esprit.pi.demo.entities.Enumeration.Genre;
 import esprit.pi.demo.entities.Enumeration.Role;
 import jakarta.persistence.*;
@@ -36,14 +37,14 @@ public class User implements UserDetails {
     private Genre genre;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private int nbr_credit;// ta3 la pute
+    private int AncienneteEmploi; //ta3 la pute
+    private boolean etat;
     private String image;
     private float salaire;
     private int matriculeFiscale;
     @Getter
     private boolean banni;
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user")
-    private List<Contrat_Factoring> contratFactorings;
     @ToString.Exclude
     @OneToOne
     private Portefeuille portefeuilleUser;
@@ -56,15 +57,32 @@ public class User implements UserDetails {
     @ToString.Exclude
     @OneToMany (mappedBy = "userCR")
     private List<Credit> credits;
-    
     @ToString.Exclude
    @OneToMany(mappedBy = "userReclamation")
     private List<Reclamation> reclamations;
     @ToString.Exclude
    @ManyToMany(mappedBy = "usersSalon")
     private List <Salon> salons;
+    @ToString.Exclude
     @OneToMany(mappedBy = "userToken")
     private List<Token> tokens;
+    @OneToOne(mappedBy = "sender")
+    private MessageChat messageSender;
+    @OneToOne(mappedBy = "receiver")
+    private MessageChat messageReceiver;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments;
+
+    @JsonIgnore
+    @ManyToOne
+    private Groupe groupe;
+    @OneToMany (mappedBy = "userNotif")
+    private List<Notification> notifications;
 
 
     @Override

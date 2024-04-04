@@ -1,10 +1,13 @@
 package esprit.pi.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import esprit.pi.demo.entities.Enumeration.PackCredit;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,6 +23,11 @@ public class PackCR implements Serializable {
     private float montantMin;
     private float montantMax;
     private String image;
+    private String nomImage;
     @Enumerated(EnumType.STRING)
     private PackCredit packCredit;
+    @ToString.Exclude
+    @JsonIgnore
+    @OneToMany(mappedBy = "packCR")
+    private List<Credit> creditP;
 }

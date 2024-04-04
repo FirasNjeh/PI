@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/creditcard")
+@RequestMapping("/user/creditcard")
 @AllArgsConstructor
 public class CreditCardController {
     private ICreditCardService iCreditCardService;

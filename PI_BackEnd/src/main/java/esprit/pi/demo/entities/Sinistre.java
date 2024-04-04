@@ -1,11 +1,13 @@
 package esprit.pi.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import esprit.pi.demo.entities.Enumeration.EtatSinistre;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.List;
+import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,12 +19,20 @@ public class Sinistre implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private LocalDate dateSinistre;
-    private String image;
+    @Temporal (TemporalType.DATE)
+    private Date dateSinistre;
     private float estimation_expert;
+    private float remboursement;
     private String lieu;
     private String description;
+    @Enumerated(EnumType.STRING)
+    private EtatSinistre etatSinistre;
+    @JsonIgnore
     @ToString.Exclude
-    @ManyToMany
-    private List <Assurance> assuranceSinistre;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="sinistre")
+    private Set<File> images;
+    @JsonIgnore
+    @ToString.Exclude
+    @ManyToOne
+    private Assurance assurance;
 }

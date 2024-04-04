@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/portefeuille")
+@RequestMapping("/user/portefeuille")
 @AllArgsConstructor
 public class PortefeuilleController {
     private IPortefeuilleService iPortefeuilleService;

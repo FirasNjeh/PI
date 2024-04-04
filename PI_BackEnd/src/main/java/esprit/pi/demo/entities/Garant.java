@@ -17,7 +17,7 @@ public class Garant implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String nomGarant;
+    private String name;
     private String prenomGarant;
     private float salaire_garant;
     private int cin;

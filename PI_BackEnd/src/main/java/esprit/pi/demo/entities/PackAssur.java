@@ -1,10 +1,13 @@
 package esprit.pi.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import esprit.pi.demo.entities.Enumeration.PackAssurance;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,8 +20,17 @@ public class PackAssur implements Serializable {
     private int id;
     private String nom;
     private String description;
-    private float prime;
-    private String image;
+    private float primeMin;
+    private float primeMax;
+
     @Enumerated(EnumType.STRING)
     private PackAssurance packAssurance;
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="packAssur")
+    private Set<File> images;
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="packAssur")
+    private Set<Assurance> assurances;
 }

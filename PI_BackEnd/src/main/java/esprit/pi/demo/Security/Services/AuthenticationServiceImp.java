@@ -8,7 +8,8 @@ import esprit.pi.demo.Repository.PortefeuilleRepository;
 import esprit.pi.demo.Repository.TokenRepository;
 import esprit.pi.demo.Repository.UserRepository;
 import esprit.pi.demo.Security.Jwt.JwtService;
-import esprit.pi.demo.Services.EmailService;
+//import esprit.pi.demo.Services.EmailService;
+import esprit.pi.demo.Services.PortefeuilleService;
 import esprit.pi.demo.entities.Portefeuille;
 import esprit.pi.demo.entities.Token;
 import esprit.pi.demo.entities.Enumeration.TokenType;
@@ -21,8 +22,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Properties;
 
 @Service
 @AllArgsConstructor
@@ -33,7 +38,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PortefeuilleRepository portefeuilleRepository;
-    private EmailService emailService;
+    private final PortefeuilleService portefeuilleService;
+//    private EmailService emailService;
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
@@ -57,10 +63,23 @@ public class AuthenticationServiceImp implements AuthenticationService {
         Portefeuille portefeuille = new Portefeuille();
         portefeuille.setUser(savedUser);
         portefeuilleRepository.save(portefeuille);
-        String to = savedUser.getEmail();
+        portefeuille=portefeuilleService.getPortefeuilleById(portefeuille.getId());
+        savedUser.setPortefeuilleUser(portefeuille);
+        userRepository.save(savedUser);
+        String to = savedUser.getEmail(); // replace with the actual recipient email
         String subject = "Confirmation d'inscription";
-        String text = "Bonjour " + savedUser.getNom() + ",\n\nVotre inscription à notre site FundHub a été confirmée avec succès.";
-        emailService.sendEmail(to, subject, text);
+        String body = "Bonjour " + savedUser.getNom() + ",\n\nVotre inscription à notre site FundHub a été confirmée avec succès.";
+
+        try {
+            sendEmail(to, subject, body);
+        } catch (MessagingException e) {
+            e.printStackTrace(); // handle the exception according to your application's needs
+        }
+
+//        String to = savedUser.getEmail();
+//        String subject = "Confirmation d'inscription";
+//        String text = "Bonjour " + savedUser.getNom() + ",\n\nVotre inscription à notre site FundHub a été confirmée avec succès.";
+//        emailService.sendEmail(to, subject, text);
         var jwtToken = jwtService.generateToken(user);
         saveUserToken(savedUser, jwtToken);
         var refreshToken =jwtService.generateRefreshToken(user) ;
@@ -146,5 +165,33 @@ public class AuthenticationServiceImp implements AuthenticationService {
             age--;
         }
         return age;
+    }
+    private void sendEmail(String to, String subject, String body) throws MessagingException {
+        // Send an email
+        // ...
+        String from = "njehfiras@gmail.com";
+        String password = "breu joma uzhw yipn";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        message.setSubject(subject);
+        //   message.setText(body);
+        message.setContent(body, "text/html");
+
+        Transport.send(message);
     }
 }
