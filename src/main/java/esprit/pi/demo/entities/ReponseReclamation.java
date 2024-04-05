@@ -17,6 +17,7 @@ public class ReponseReclamation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(columnDefinition="TEXT")
     private String description;
     @Temporal(TemporalType.DATE)
     private Date dateReponse;

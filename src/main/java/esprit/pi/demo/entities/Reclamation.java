@@ -27,8 +27,8 @@ public class Reclamation {
     @Enumerated(EnumType.STRING)
     private PriorityLevel priorityLevel;
     private String typeRC;
-
-
+    @Lob
+    private byte[] image;
 
     /*@ToString.Exclude
             @ManyToOne
@@ -49,6 +49,17 @@ public class Reclamation {
         this.typeRC = typeRC;
         this.reponseRC = reponseRC;
     }
+
+    public Reclamation(String object, String description, StatusRC statusRC, Date dateRC, PriorityLevel priorityLevel, String typeRC, byte[] image) {
+        this.object = object;
+        this.description = description;
+        this.statusRC = statusRC;
+        this.dateRC = dateRC;
+        this.priorityLevel = priorityLevel;
+        this.typeRC = typeRC;
+        this.image = image;
+    }
+
 
     public int getId() {
         return id;
@@ -112,5 +123,13 @@ public class Reclamation {
 
     public void setReponseRC(ReponseReclamation reponseRC) {
         this.reponseRC = reponseRC;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }
